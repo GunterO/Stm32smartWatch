@@ -30,10 +30,6 @@ RM := rm -rf
 -include lvgl/src/lv_draw/subdir.mk
 -include lvgl/src/lv_core/subdir.mk
 -include lvgl/porting/subdir.mk
--include Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/subdir.mk
--include Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/subdir.mk
--include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/subdir.mk
--include Middlewares/Third_Party/FreeRTOS/Source/subdir.mk
 -include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
@@ -80,8 +76,8 @@ all: main-build
 main-build: smartWatch.elf secondary-outputs
 
 # Tool invocations
-smartWatch.elf: $(OBJS) $(USER_OBJS) /home/neset/stmProjects/smartWatch/STM32F407VGTX_FLASH.ld
-	arm-none-eabi-gcc -o "smartWatch.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/neset/stmProjects/smartWatch/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="smartWatch.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+smartWatch.elf: $(OBJS) $(USER_OBJS) /home/neset/Stm32smartWatch/STM32F407VGTX_FLASH.ld
+	arm-none-eabi-gcc -o "smartWatch.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/neset/Stm32smartWatch/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="smartWatch.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
