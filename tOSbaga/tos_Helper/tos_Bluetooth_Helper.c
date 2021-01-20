@@ -42,7 +42,7 @@ void tos_BluetoothReceiverAndTransmitter(RTC_HandleTypeDef *hrtc){
 void tos_Bluetooth_FirstConnectGetValues(RTC_HandleTypeDef *hrtc){
 	  isConnected=BLUETOOTH_IS_CONNECT;
 	  if(befConnectVal!=isConnected){
-	  HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, "connected", 20,50);
+	  HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, (unsigned char *)"connected", 20,50);
 	 if(isConnected){
 		  timeTryAgain:
 		  if(!isConnected) return;
@@ -51,8 +51,8 @@ void tos_Bluetooth_FirstConnectGetValues(RTC_HandleTypeDef *hrtc){
 		  if(!(rx_buffer[0]=='t' && rx_buffer[1]=='i' && rx_buffer[2]=='m' && rx_buffer[3]=='e'))
 			  goto timeTryAgain;
 		  else{
-			  sscanf(tmp,"time %2d %2d %2d",&time[0],&time[1],&time[2]);
-			  HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, "wasSetTime", 20,50);
+			  sscanf(tmp,"time %2hu %2hu %2hu",&time[0],&time[1],&time[2]);
+			  HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, (unsigned char *)"wasSetTime", 20,50);
 			  sprintf(rx_buffer, "OK");
 		  }
 		 dateTryAgain:
@@ -62,9 +62,9 @@ void tos_Bluetooth_FirstConnectGetValues(RTC_HandleTypeDef *hrtc){
 		  if(!(rx_buffer[0]=='d' && rx_buffer[1]=='a' && rx_buffer[2]=='t' && rx_buffer[3]=='e'))
 			  goto dateTryAgain;
 		  else{
-			  sscanf(tmp,"date %2d %2d %2d",
+			  sscanf(tmp,"date %2hu %2hu %2hu",
 			  					  &date[0],&date[1],&date[2]);
-			  HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, "wasSetDate", 20,50);
+			  HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, (unsigned char *)"wasSetDate", 20,50);
 			  sprintf(rx_buffer, "OK");
 		  }
 		  tos_RTC_SetDate(hrtc,date[0],date[1],date[2]);
@@ -93,7 +93,7 @@ void tos_Bluetooth_GetAndPushNotification(void){
 			  BluetoothNotfP=&BluetoothNotf[0];
 			  if(BluetoothAppNameP!=NULL && BluetoothNotfP!=NULL)
 			  blNotnode=tos_NotificationPushItem(blNotnode,BluetoothAppNameP,BluetoothNotfP);
-			  HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, "wasPushNotf", 20,50);
+			  HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, (unsigned char *)"wasPushNotf", 20,50);
 			  sprintf(rx_buffer, "OK");
 		  }
 	}
@@ -103,14 +103,14 @@ void tos_Bluetooth_GetAndPushNotification(void){
 void tos_Bluetooth_SetBatteryVal(uint8_t batteryVal){
 	if(isConnected){
 		  sprintf(tx_buffer, "chargeVal %d",batteryVal);
-		    HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, tx_buffer, 20,50);
+		    HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, (unsigned char *)tx_buffer, 20,50);
 		  }
 }
 /*This function using for set steps value*/
 void tos_Bluetooth_SetStepsVal(uint8_t stepsVal){
 	if(isConnected){
 		  sprintf(tx_buffer, "stepsVal %d",stepsVal);
-		    HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, tx_buffer, 20,50);
+		    HAL_UART_Transmit(&TOS_BLUETOOTH_PORT, (unsigned char *)tx_buffer, 20,50);
 		  }
 }
 void tos_BluetoothGetStatusVAl(bool bluetoothStatus,uint8_t Screen){
