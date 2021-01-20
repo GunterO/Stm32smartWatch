@@ -74,6 +74,13 @@ const osThreadAttr_t bluetoothTask_attributes = {
   .priority = (osPriority_t) osPriorityAboveNormal6,
   .stack_size = 2560 * 4
 };
+/* Definitions for blinkTask */
+osThreadId_t blinkTaskHandle;
+const osThreadAttr_t blinkTask_attributes = {
+  .name = "blinkTask",
+  .priority = (osPriority_t) osPriorityAboveNormal6,
+  .stack_size = 128 * 4
+};
 /* USER CODE BEGIN PV */
 RTC_TimeTypeDef sTime = {0};
 RTC_DateTypeDef sDate = {0};
@@ -93,6 +100,7 @@ static void MX_TIM2_Init(void);
 void StartguiTAsk(void *argument);
 void StartcontrollerTask(void *argument);
 void StartbluetoothTask(void *argument);
+void StartblinkTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 /* USER CODE END PFP */
@@ -138,6 +146,7 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
   //tos_Flash_Init();
 
 	//tos_RTC_init(&hrtc);
@@ -171,6 +180,9 @@ int main(void)
 
   /* creation of bluetoothTask */
   bluetoothTaskHandle = osThreadNew(StartbluetoothTask, NULL, &bluetoothTask_attributes);
+
+  /* creation of blinkTask */
+  blinkTaskHandle = osThreadNew(StartblinkTask, NULL, &blinkTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -545,10 +557,14 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, ST7789_RST_Pin|ST7789_DC_Pin|ST7789_CS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : Left_Btn_Pin Enter_Btn_Pin Right_Btn_Pin */
   GPIO_InitStruct.Pin = Left_Btn_Pin|Enter_Btn_Pin|Right_Btn_Pin;
@@ -562,6 +578,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LD4_Pin LD3_Pin LD5_Pin LD6_Pin */
+  GPIO_InitStruct.Pin = LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pin : BluetoothState_Pin */
   GPIO_InitStruct.Pin = BluetoothState_Pin;
@@ -585,16 +608,17 @@ static void MX_GPIO_Init(void)
 void StartguiTAsk(void *argument)
 {
   /* USER CODE BEGIN 5 */
-	  tos_Tft_init();
-	  tos_Get_Rtc(&hrtc);
-	  tos_Screen_Init();
-		ST7789_UnSelect();
-  /* Infinite loop */
-  for(;;)
-  {lv_task_handler();
-  lv_tick_inc(1);
-    osDelay(1);
-  }
+	tos_Tft_init();
+	tos_Get_Rtc(&hrtc);
+	tos_Screen_Init();
+	ST7789_UnSelect();
+	/* Infinite loop */
+	for(;;)
+	{
+	  lv_task_handler();
+	  lv_tick_inc(1);
+	  osDelay(1);
+	}
   /* USER CODE END 5 */
 }
 
@@ -608,12 +632,13 @@ void StartguiTAsk(void *argument)
 void StartcontrollerTask(void *argument)
 {
   /* USER CODE BEGIN StartcontrollerTask */
-  /* Infinite loop */
-  for(;;)
-  {tos_Screen_Variables_Getter(tos_Get_Current_Screen());
-  tos_ScreenController();
-    osDelay(5);
-  }
+	/* Infinite loop */
+	for(;;)
+	{
+	  tos_Screen_Variables_Getter(tos_Get_Current_Screen());
+	  tos_ScreenController();
+	  osDelay(5);
+	}
   /* USER CODE END StartcontrollerTask */
 }
 
@@ -628,13 +653,33 @@ void StartbluetoothTask(void *argument)
 {
   /* USER CODE BEGIN StartbluetoothTask */
 	tos_Bluetooth_NotificationItemInit();
-  /* Infinite loop */
-  for(;;)
-  {	  tos_BluetoothReceiverAndTransmitter(&hrtc);
-  	  tos_BluetoothGetStatusVAl(tos_BluetoothGetEnableVal(),tos_Get_Current_Screen());
-    osDelay(1);
-  }
+	/* Infinite loop */
+	for(;;)
+	{
+		tos_BluetoothReceiverAndTransmitter(&hrtc);
+		tos_BluetoothGetStatusVAl(tos_BluetoothGetEnableVal(),tos_Get_Current_Screen());
+		osDelay(1);
+	}
   /* USER CODE END StartbluetoothTask */
+}
+
+/* USER CODE BEGIN Header_StartblinkTask */
+/**
+* @brief Function implementing the blinkTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartblinkTask */
+void StartblinkTask(void *argument)
+{
+  /* USER CODE BEGIN StartblinkTask */
+	/* Infinite loop */
+	for(;;)
+	{
+		HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
+		osDelay(500);
+	}
+  /* USER CODE END StartblinkTask */
 }
 
  /**
