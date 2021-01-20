@@ -1,0 +1,8 @@
+# User-specific stuff:
+
+# Compiler output
+Debug/
+Release/
+.mxproject
+.settings/stm32cubeide.project.prefs
+.settings/language.settings.xml
